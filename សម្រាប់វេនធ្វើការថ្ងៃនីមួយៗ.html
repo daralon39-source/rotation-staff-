@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#15233b">
+<title>Staff Rotation V3</title>
+<style>
+:root{color-scheme:light;--navy:#15233b;--blue:#315efb;--bg:#f3f5f9;--card:#fff;--muted:#697386;--line:#e5e9f0;--green:#16845b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#182235;padding-bottom:32px}
+header{background:var(--navy);color:#fff;padding:24px 18px 22px;border-radius:0 0 24px 24px}
+header .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-size:22px;margin:0 0 5px}header p{margin:0;color:#c7d1e2;font-size:13px}
+.pill{font-size:11px;background:#244c42;color:#9ff0c9;padding:6px 10px;border-radius:20px}
+main{max-width:720px;margin:auto;padding:15px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:-4px}
+.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px}
+.stat b{display:block;font-size:25px}.stat span{font-size:12px;color:var(--muted)}
+nav{display:flex;gap:7px;margin:15px 0;overflow:auto}
+nav button{border:0;border-radius:12px;background:#e8ecf4;padding:11px 14px;font-weight:650;color:#42506a;white-space:nowrap}
+nav button.active{background:var(--navy);color:#fff}
+h2{font-size:17px;margin:0 0 12px}.muted{color:var(--muted);font-size:12px}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}
+input,select{width:100%;border:1px solid #d9dfeb;border-radius:11px;padding:12px;font:inherit;background:#fff;color:#182235}
+button{cursor:pointer;font:inherit}
+.primary,.secondary,.danger{border:0;border-radius:12px;padding:12px 14px;font-weight:700}
+.primary{background:var(--blue);color:#fff}.secondary{background:#e9edf5;color:#26354d}.danger{background:#fff0f0;color:#b42318}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+.assignment{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.assignment:last-child{border:0}.desk{width:42px;height:42px;border-radius:12px;background:#edf1fa;display:grid;place-items:center;font-weight:800;color:#315efb}
+.person{font-weight:700}.sub{font-size:12px;color:var(--muted);margin-top:3px}.tag{margin-left:auto;font-size:11px;color:var(--green);background:#e8f7f0;border-radius:20px;padding:6px 9px}
+.day{padding:13px 0;border-bottom:1px solid var(--line)}.dayhead{font-weight:750;margin-bottom:7px}.daygrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.daygrid span{font-size:12px;background:#f5f7fb;padding:7px;border-radius:8px}
+.person-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end;margin-bottom:9px}
+.notice{background:#fff8e7;border:1px solid #f3dfae;border-radius:12px;padding:12px;font-size:12px;line-height:1.6;color:#72551a;margin-top:12px}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:18px}
+@media(min-width:600px){.stats{grid-template-columns:1fr 1fr}.daygrid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>Staff Rotation</h1><p>ប្រព័ន្ធប្តូរវេនបុគ្គលិក · Version 3</p></div><span class="pill">AUTO ROTATION</span></div></header>
+<main>
+<section class="stats">
+ <div class="stat"><b id="staffCount">4</b><span>បុគ្គលិកសកម្ម</span></div>
+ <div class="stat"><b id="deskCount">4</b><span>តុ / កុំព្យូទ័រ</span></div>
+</section>
+<nav>
+ <button class="active" data-tab="today">ថ្ងៃនេះ</button><button data-tab="schedule">កាលវិភាគ</button><button data-tab="settings">ការកំណត់</button>
+</nav>
+<section id="today" class="panel">
+ <h2>ការបែងចែកតុថ្ងៃនេះ</h2>
+ <div class="muted">ប្រព័ន្ធគណនាវេនតាមកាលបរិច្ឆេទបច្ចុប្បន្នដោយស្វ័យប្រវត្តិ</div>
+ <label for="pickDate">ជ្រើសរើសកាលបរិច្ឆេទ</label><input type="date" id="pickDate">
+ <div id="todayList"></div>
+ <div class="actions"><button class="secondary" id="copyToday">ចម្លងតារាង</button><button class="primary" id="todayNow">ត្រឡប់មកថ្ងៃនេះ</button></div>
+</section>
+<section id="schedule" class="panel" hidden>
+ <h2>កាលវិភាគ 7 ថ្ងៃ</h2>
+ <label for="weekDate">ចាប់ផ្តើមពីថ្ងៃ</label><input type="date" id="weekDate">
+ <div id="weekList"></div>
+ <button class="secondary" id="copyWeek" style="width:100%;margin-top:12px">ចម្លងកាលវិភាគ 7 ថ្ងៃ</button>
+</section>
+<section id="settings" class="panel" hidden>
+ <h2>គ្រប់គ្រងបុគ្គលិក និងតុ</h2>
+ <div class="muted">កែឈ្មោះខាងក្រោម រួចចុចរក្សាទុក។ កម្មវិធីរក្សាទុកលើ browser ក្នុង iPhone នេះ។</div>
+ <div id="editRows"></div>
+ <label for="anchor">ថ្ងៃចាប់ផ្តើមលំដាប់ដើម</label><input type="date" id="anchor">
+ <div class="actions"><button class="primary" id="saveSettings">រក្សាទុកការកំណត់</button></div>
+ <div class="notice">ទិន្នន័យត្រូវបានរក្សាទុកក្នុង browser លើឧបករណ៍នេះ។ កុំលុប Website Data ឬប្រវត្តិទិន្នន័យ Safari មុនពេល Backup។ ការប្តូរវេនគណនាតាមថ្ងៃ ដូច្នេះមិនចាំបាច់បើកកម្មវិធីរាល់ថ្ងៃទេ។</div>
+ <h2 style="margin-top:22px">Backup ទិន្នន័យ</h2>
+ <div class="actions"><button class="secondary" id="exportData">ទាញយក Backup</button><button class="secondary" id="importBtn">នាំចូល Backup</button></div>
+ <input id="importFile" type="file" accept="application/json" hidden>
+ <div class="actions"><button class="danger" id="resetData">កំណត់ទិន្នន័យដើមឡើងវិញ</button></div>
+</section>
+</main>
+<footer>Staff Rotation V3 · Local data on this device</footer>
+<script>
+const KEY='staffRotationV3';
+const defaults={staff:['បុគ្គលិកទី 1','បុគ្គលិកទី 2','បុគ្គលិកទី 3','បុគ្គលិកទី 4'],desks:['កុំព្យូទ័រទី 1','កុំព្យូទ័រទី 2','កុំព្យូទ័រទី 3','កុំព្យូទ័រទី 4'],anchor:'2026-10-30'};
+let data=load();
+function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return {...defaults}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+const $=id=>document.getElementById(id);
+function dateISO(d){let x=new Date(d);return [x.getFullYear(),String(x.getMonth()+1).padStart(2,'0'),String(x.getDate()).padStart(2,'0')].join('-')}
+function todayISO(){return dateISO(new Date())}
+function shiftDate(s,n){let d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return dateISO(d)}
+function rotation(s){let a=new Date(data.anchor+'T12:00:00'),b=new Date(s+'T12:00:00');let days=Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000);let n=((days%data.staff.length)+data.staff.length)%data.staff.length;return data.staff.map((_,i)=>data.staff[(i-n+data.staff.length)%data.staff.length])}
+function pretty(s){return new Date(s+'T12:00:00').toLocaleDateString('km-KH',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function renderToday(){let d=$('pickDate').value||todayISO(),a=rotation(d);$('todayList').innerHTML=a.map((p,i)=>`<div class="assignment"><div class="desk">${i+1}</div><div><div class="person">${esc(data.desks[i]||'តុ '+(i+1))}</div><div class="sub">${esc(p)}</div></div><span class="tag">បានចាត់តាំង</span></div>`).join('');}
+function renderWeek(){let d=$('weekDate').value||todayISO();$('weekList').innerHTML=Array.from({length:7},(_,i)=>{let day=shiftDate(d,i),a=rotation(day);return `<div class="day"><div class="dayhead">${pretty(day)}</div><div class="daygrid">${a.map((p,j)=>`<span>${esc(data.desks[j])}: <b>${esc(p)}</b></span>`).join('')}</div></div>`}).join('')}
+function renderSettings(){$('editRows').innerHTML=data.staff.map((p,i)=>`<div class="person-row"><div><label>ឈ្មោះបុគ្គលិក ${i+1}</label><input data-staff="${i}" value="${attr(p)}"></div><div><label>ឈ្មោះតុ ${i+1}</label><input data-desk="${i}" value="${attr(data.desks[i])}"></div></div>`).join('');$('anchor').value=data.anchor}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function attr(s){return esc(s)}
+function render(){ $('staffCount').textContent=data.staff.length;$('deskCount').textContent=data.desks.length;renderToday();renderWeek();renderSettings()}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));['today','schedule','settings'].forEach(t=>$(t).hidden=t!==b.dataset.tab);}));
+$('pickDate').value=todayISO();$('weekDate').value=todayISO();
+$('pickDate').addEventListener('change',renderToday);$('weekDate').addEventListener('change',renderWeek);
+$('todayNow').onclick=()=>{$('pickDate').value=todayISO();renderToday()};
+$('copyToday').onclick=()=>{let d=$('pickDate').value,a=rotation(d);copy(`${pretty(d)}\n${a.map((p,i)=>data.desks[i]+' : '+p).join('\n')}`)};
+$('copyWeek').onclick=()=>{let d=$('weekDate').value;copy(Array.from({length:7},(_,i)=>{let x=shiftDate(d,i);return pretty(x)+'\n'+rotation(x).map((p,j)=>data.desks[j]+' : '+p).join('\n')}).join('\n\n'))};
+function copy(t){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>alert('បានចម្លងតារាងរួចរាល់')) .catch(()=>prompt('ចម្លងអត្ថបទនេះ',t))}else prompt('ចម្លងអត្ថបទនេះ',t)}
+$('saveSettings').onclick=()=>{document.querySelectorAll('[data-staff]').forEach(x=>data.staff[+x.dataset.staff]=x.value.trim()||'បុគ្គលិក '+(+x.dataset.staff+1));document.querySelectorAll('[data-desk]').forEach(x=>data.desks[+x.dataset.desk]=x.value.trim()||'តុ '+(+x.dataset.desk+1));data.anchor=$('anchor').value||todayISO();save();render();alert('បានរក្សាទុកការកំណត់')};
+$('exportData').onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='staff-rotation-backup.json';a.click();URL.revokeObjectURL(u)};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{try{let obj=JSON.parse(await e.target.files[0].text());if(!Array.isArray(obj.staff)||!Array.isArray(obj.desks)||obj.staff.length!==obj.desks.length)throw Error();data=obj;save();render();alert('បាននាំចូល Backup')}catch(err){alert('ឯកសារ Backup មិនត្រឹមត្រូវ')}e.target.value=''};
+$('resetData').onclick=()=>{if(confirm('តើអ្នកប្រាកដថាចង់កំណត់ទិន្នន័យដើមឡើងវិញទេ?')){data={...defaults,staff:[...defaults.staff],desks:[...defaults.desks]};save();render()}};
+render();
+</script>
+</body></html>
